@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plazur | Képek</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="gallery-page">
+
+    <nav id="navbar" class="scrolled">
+        <div class="nav-left">
+            <a href="rolunk.html">Biográfia</a>
+            <a href="videok.html">Videók</a>
+            <a href="kepek.html" class="active">Képek</a>
+            <a href="szervezes.html">Szervezés</a>
+            <a href="index.html#koncertek">Koncertek</a>
+        </div>
+        <a href="index.html" id="nav-logo" style="opacity: 1;">PLAZÚR</a>
+        <div class="nav-right">
+            <a href="https://www.instagram.com/plazurazur/" target="_blank" rel="noopener noreferrer"><img src="icons/instagram.png" alt="Instagram"></a>
+            <a href="https://www.youtube.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/youtube.png" alt="YouTube"></a>
+            <a href="https://www.facebook.com/plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/facebook.png" alt="Facebook"></a>
+            <a href="https://www.tiktok.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/tiktok.png" alt="TikTok"></a>
+            <a href="https://open.spotify.com/artist/196J51GC9C3HNNVA4sBsXX?si=Z2nPUtMfTV-GUhRzpzaAwg" target="_blank" rel="noopener noreferrer"><img src="icons/spotify.png" alt="Spotify"></a>
+        </div>
+    </nav>
+
+    <div id="gallery-sections" class="gallery-page"></div>
+
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000'
+            : 'https://csap.biborkave.lol';
+
+        async function loadGallery() {
+            const container = document.getElementById('gallery-sections');
+            try {
+                const res = await fetch(`${API_BASE}/api/albumok`);
+                if (!res.ok) throw new Error();
+                const albumok = await res.json();
+
+                if (albumok.length === 0) {
+                    container.innerHTML = '<p class="gallery-empty">Hamarosan érkeznek a képek.</p>';
+                    return;
+                }
+
+                container.innerHTML = albumok.map(album => `
+                    <section class="gallery-section">
+                        <h2 class="gallery-title">${escapeHtml(album.nev)}</h2>
+                        <div class="gallery-grid">
+                            ${album.kepek.map(kep => `
+                                <div class="gallery-item" onclick="openLightbox('${API_BASE}/uploads/${escapeHtml(kep.filename)}')">
+                                    <img src="${API_BASE}/uploads/${escapeHtml(kep.filename)}" alt="${escapeHtml(album.nev)}" loading="lazy">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </section>
+                `).join('');
+            } catch {
+                container.innerHTML = '<p class="gallery-error">Hiba a képek betöltésekor.</p>';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.getElementById('lightbox-img').src = '';
+        }
+
+        document.getElementById('lightbox').addEventListener('click', function(e) {
+            if (e.target === this || e.target.classList.contains('lightbox-close')) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadGallery);
+    </script>
+</body>
+</html>

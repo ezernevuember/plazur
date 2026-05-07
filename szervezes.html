@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plazur | Szervezés</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="placeholder-page">
+
+    <nav id="navbar" class="scrolled">
+        <div class="nav-left">
+            <a href="rolunk.html">Biográfia</a>
+            <a href="videok.html">Videók</a>
+            <a href="kepek.html">Képek</a>
+            <a href="szervezes.html" class="active">Szervezés</a>
+            <a href="index.html#koncertek">Koncertek</a>
+        </div>
+        <a href="index.html" id="nav-logo" style="opacity: 1;">PLAZÚR</a>
+        <div class="nav-right">
+            <a href="https://www.instagram.com/plazurazur/" target="_blank" rel="noopener noreferrer"><img src="icons/instagram.png" alt="Instagram"></a>
+            <a href="https://www.youtube.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/youtube.png" alt="YouTube"></a>
+            <a href="https://www.facebook.com/plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/facebook.png" alt="Facebook"></a>
+            <a href="https://www.tiktok.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/tiktok.png" alt="TikTok"></a>
+            <a href="https://open.spotify.com/artist/196J51GC9C3HNNVA4sBsXX?si=Z2nPUtMfTV-GUhRzpzaAwg" target="_blank" rel="noopener noreferrer"><img src="icons/spotify.png" alt="Spotify"></a>
+        </div>
+    </nav>
+
+    <section class="organize-section">
+        <h1 class="page-title">SZERVEZÉS</h1>
+
+        <div class="contact-card">
+            <h3>Kapcsolattartó</h3>
+            <p class="contact-name">Jakab Tamás</p>
+            <a href="mailto:tamas.jakab95@gmail.com" class="contact-email">tamas.jakab95@gmail.com</a>
+        </div>
+
+        <div class="assets-grid">
+            <div class="asset-item">
+                <h3>Technikai Rider</h3>
+                <div class="image-container img-clickable"
+                     onclick="openLightbox('images/Plazúr rider.png', 'Plazur_technikai_rider.png')">
+                    <img src="images/Plazúr rider.png" alt="Technikai Rider" class="organize-img">
+                    <a href="images/Plazúr rider.png" download="Plazur_technikai_rider.png"
+                       class="hover-download-btn" onclick="event.stopPropagation()">⬇ Letöltés</a>
+                </div>
+            </div>
+
+            <div class="asset-item">
+                <h3>Logó (.png)</h3>
+                <div class="image-container img-clickable"
+                     onclick="openLightbox('images/logo_260223-4.png', 'Plazur_logo.png')">
+                    <img src="images/logo_260223-4.png" alt="Plazur Logo" class="organize-img">
+                    <a href="images/logo_260223-4.png" download="Plazur_logo.png"
+                       class="hover-download-btn" onclick="event.stopPropagation()">⬇ Letöltés</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="press-section">
+            <h3>Sajtófotók</h3>
+            <div class="press-grid">
+                <div class="press-item img-clickable"
+                     onclick="openLightbox('images/IMG_0183.JPG', 'Plazur_sajto_1.jpg')">
+                    <img src="images/IMG_0183.JPG" alt="Sajtófotó 1">
+                    <a href="images/IMG_0183.JPG" download="Plazur_sajto_1.jpg"
+                       class="hover-download-btn" onclick="event.stopPropagation()">⬇ Letöltés</a>
+                </div>
+                <div class="press-item img-clickable"
+                     onclick="openLightbox('images/IMG_0186 (1).JPG', 'Plazur_sajto_2.jpg')">
+                    <img src="images/IMG_0186 (1).JPG" alt="Sajtófotó 2">
+                    <a href="images/IMG_0186 (1).JPG" download="Plazur_sajto_2.jpg"
+                       class="hover-download-btn" onclick="event.stopPropagation()">⬇ Letöltés</a>
+                </div>
+                <div class="press-item img-clickable"
+                     onclick="openLightbox('images/kezdo.jpg', 'Plazur_sajto_3.jpg')">
+                    <img src="images/kezdo.jpg" alt="Sajtófotó 3">
+                    <a href="images/kezdo.jpg" download="Plazur_sajto_3.jpg"
+                       class="hover-download-btn" onclick="event.stopPropagation()">⬇ Letöltés</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+            <a id="lightbox-download" href="" download class="lightbox-download-btn">⬇ Letöltés</a>
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(src, filename) {
+            const img = document.getElementById('lightbox-img');
+            const dl = document.getElementById('lightbox-download');
+            img.src = src;
+            dl.href = src;
+            dl.download = filename;
+            document.getElementById('lightbox').classList.add('active');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.getElementById('lightbox-img').src = '';
+        }
+
+        document.getElementById('lightbox').addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plazur | Videók</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body class="video-page">
+
+    <nav id="navbar" class="scrolled">
+        <div class="nav-left">
+            <a href="rolunk.html">Biográfia</a>
+            <a href="videok.html" class="active">Videók</a>
+            <a href="kepek.html">Képek</a>
+            <a href="szervezes.html">Szervezés</a>
+            <a href="index.html#koncertek">Koncertek</a>
+        </div>
+        <a href="index.html" id="nav-logo" style="opacity: 1;">PLAZÚR</a>
+        <div class="nav-right">
+            <a href="https://www.instagram.com/plazurazur/" target="_blank" rel="noopener noreferrer"><img src="icons/instagram.png" alt="Instagram"></a>
+            <a href="https://www.youtube.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/youtube.png" alt="YouTube"></a>
+            <a href="https://www.facebook.com/plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/facebook.png" alt="Facebook"></a>
+            <a href="https://www.tiktok.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/tiktok.png" alt="TikTok"></a>
+            <a href="https://open.spotify.com/artist/196J51GC9C3HNNVA4sBsXX?si=Z2nPUtMfTV-GUhRzpzaAwg" target="_blank" rel="noopener noreferrer"><img src="icons/spotify.png" alt="Spotify"></a>
+        </div>
+    </nav>
+
+    <div id="video-sections"></div>
+
+    <a href="#koncertvideok" id="floating-concert-btn" class="jump-btn-fixed hidden">Koncertvideók</a>
+
+    <script>
+        function getYoutubeId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?\s]+)/);
+            return match ? match[1] : url;
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://csap.biborkave.lol';
+
+        async function loadVideos() {
+            const container = document.getElementById('video-sections');
+            const floatingBtn = document.getElementById('floating-concert-btn');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/videok`);
+                if (!response.ok) throw new Error('Hiba');
+
+                const videok = await response.json();
+
+                const klippek = videok.filter(v => v.kategoria === 'klipp');
+                const koncertek = videok.filter(v => v.kategoria === 'koncert');
+
+                let html = '';
+
+                if (klippek.length > 0) {
+                    html += `
+                        <section class="video-category">
+                            <h2>Videóklippek</h2>
+                            <div class="video-grid">
+                                ${klippek.map(v => renderVideo(v)).join('')}
+                            </div>
+                        </section>
+                    `;
+                }
+
+                if (koncertek.length > 0) {
+                    html += `
+                        <section class="video-category" id="koncertvideok">
+                            <h2>Koncertvideók</h2>
+                            <div class="video-grid">
+                                ${koncertek.map(v => renderVideo(v)).join('')}
+                            </div>
+                        </section>
+                    `;
+                    floatingBtn.classList.remove('hidden');
+                }
+
+                if (klippek.length === 0 && koncertek.length === 0) {
+                    html = '<section class="video-category"><p style="color: #99a0b9; text-align: center;">Hamarosan érkeznek a videók.</p></section>';
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                container.innerHTML = '<section class="video-category"><p style="color: #ff4c4c; text-align: center;">Hiba a videók betöltésekor.</p></section>';
+            }
+        }
+
+        function renderVideo(v) {
+            const youtubeId = getYoutubeId(v.youtube_url);
+            const embedUrl = `https://www.youtube.com/embed/${escapeHtml(youtubeId)}`;
+            return `
+                <div class="video-item">
+                    <div class="video-content">
+                        <h3>${escapeHtml(v.nev)}</h3>
+                        <div class="iframe-wrapper">
+                            <iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadVideos);
+
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById('floating-concert-btn');
+            const section = document.getElementById('koncertvideok');
+            if (!section) return;
+            if (window.scrollY > section.offsetTop - 200) {
+                btn.classList.add('hidden');
+            } else {
+                btn.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

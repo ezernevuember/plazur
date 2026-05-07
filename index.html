@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plazur | Official</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+</head>
+<body>
+
+    <nav id="navbar">
+        <div class="nav-left">
+            <a href="rolunk.html">Biográfia</a>
+            <a href="videok.html">Videók</a>
+            <a href="kepek.html">Képek</a>
+            <a href="szervezes.html">Szervezés</a>
+            <a href="index.html#koncertek">Koncertek</a>
+        </div>
+
+        <div id="nav-logo" style="color: #67cafb">PLAZÚR</div>
+
+        <div class="nav-right">
+            <a href="https://www.instagram.com/plazurazur/" target="_blank" rel="noopener noreferrer"><img src="icons/instagram.png" alt="Instagram"></a>
+            <a href="https://www.youtube.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/youtube.png" alt="YouTube"></a>
+            <a href="https://www.facebook.com/plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/facebook.png" alt="Facebook"></a>
+            <a href="https://www.tiktok.com/@plazurazur" target="_blank" rel="noopener noreferrer"><img src="icons/tiktok.png" alt="TikTok"></a>
+            <a href="https://open.spotify.com/artist/196J51GC9C3HNNVA4sBsXX?si=Z2nPUtMfTV-GUhRzpzaAwg" target="_blank" rel="noopener noreferrer"><img src="icons/spotify.png" alt="Spotify"></a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 id="main-title">PLAZÚR</h1>
+        </div>
+    </section>
+
+    <section id="koncertek" class="concert-section">
+        <h2>Közelgő Koncertek</h2>
+        <div id="concert-container" class="concert-container">
+            <p style="color: #99a0b9; text-align: center; width: 100%;">Koncertek betöltése...</p>
+        </div>
+    </section>
+
+    <script>
+        const navbar = document.getElementById('navbar');
+        const navLogo = document.getElementById('nav-logo');
+        const mainTitle = document.getElementById('main-title');
+        const concertLink = document.querySelector('a[href*="#koncertek"]');
+        const concertSection = document.getElementById('koncertek');
+
+        window.addEventListener('scroll', function() {
+            const scrollPos = window.scrollY;
+            if (scrollPos > 100) {
+                navbar.classList.add('scrolled');
+                navLogo.style.opacity = "1";
+                mainTitle.style.opacity = "0";
+            } else {
+                navbar.classList.remove('scrolled');
+                navLogo.style.opacity = "0";
+                mainTitle.style.opacity = "1";
+            }
+        });
+
+        const observerOptions = { root: null, rootMargin: '-100px 0px -20% 0px', threshold: 0.05 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) concertLink.classList.add('scroll-active');
+                else concertLink.classList.remove('scroll-active');
+            });
+        }, observerOptions);
+
+        if (concertSection) observer.observe(concertSection);
+    </script>
+
+    <script>
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function safeUrl(url) {
+            if (!url) return null;
+            return (url.startsWith('https://') || url.startsWith('http://')) ? url : null;
+        }
+
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://csap.biborkave.lol';
+
+        async function loadConcerts() {
+            const container = document.getElementById('concert-container');
+            try {
+                const response = await fetch(`${API_BASE}/api/koncertek`);
+                if (!response.ok) throw new Error('Hiba');
+
+                const koncertek = await response.json();
+
+                if (koncertek.length === 0) {
+                    container.innerHTML = '<p style="color: #99a0b9; text-align: center; width: 100%;">Jelenleg nincs bejelentett koncertünk.</p>';
+                    return;
+                }
+
+                container.innerHTML = koncertek.map(koncert => {
+                    const jegyUrl = safeUrl(koncert.jegy_link);
+                    const fbUrl = safeUrl(koncert.fb_link);
+                    return `
+                        <div class="concert-card">
+                            <h2>${escapeHtml(koncert.nev)}</h2>
+                            <h3 class="concert-venue">📍 ${escapeHtml(koncert.helyszin)}</h3>
+                            <p class="concert-date">${escapeHtml(koncert.datum)}</p>
+                            <div class="btn-wrapper">
+                                ${jegyUrl
+                                    ? `<a href="${jegyUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-ticket">Jegyvásárlás</a>`
+                                    : `<span class="btn btn-inactive">Hamarosan</span>`
+                                }
+                                ${fbUrl
+                                    ? `<a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-facebook">Facebook</a>`
+                                    : `<span class="btn btn-inactive">Nincs esemény</span>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                container.innerHTML = '<p style="color: #ff4c4c; text-align: center; width: 100%;">Hiba az adatok betöltésekor.</p>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadConcerts);
+    </script>
+</body>
+</html>
